@@ -14,6 +14,7 @@ import Procesor_wykres from "./procesor_wykres";
 import ComputerIcon from "@mui/icons-material/Computer";
 import StorageIcon from "@mui/icons-material/Storage";
 import Ram_wykres from "./ram_wykres";
+import Firewall_Info_Table from "./firewall_info_table";
 
 const style = {
   position: "absolute",
@@ -51,7 +52,7 @@ export default function M_status() {
     try {
       const response = await fetch("http://172.16.15.106:3000/status");
       const json = await response.json();
-      console.log(json);
+      // console.log(json);
 
       const cpuValue = json["cpu-load"];
       const ramValue = json["free-memory"];
@@ -66,7 +67,6 @@ export default function M_status() {
       setRam("");
       setConnected(false);
     }
-    console.log("called");
   };
 
   useEffect(() => {
@@ -78,70 +78,66 @@ export default function M_status() {
   }, []);
 
   return (
-    <div>
-      <Box sx={{ width: "100%", typography: "body1" }}>
+    <div className="flex flex-col min-h-screen">
+      <Box className="w-full flex-1">
         <TabContext value={value}>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList onChange={handleChange} aria-label="status tabs">
-              <Tab label="CPU" value="1" />
-              <Tab label="RAM" value="2" />
-              <Tab label="Check Internet" value="3" />
+          <Box className="border-b border-gray-300">
+            <TabList onChange={handleChange} centered>
+              <Tab label="Firewall Info" value="1" />
+              <Tab label="Item Two" value="2" />
+              <Tab label="Item Three" value="3" />
             </TabList>
           </Box>
 
-          <TabPanel value="1">{cpu}</TabPanel>
-          <TabPanel value="2">{ram}</TabPanel>
-          <TabPanel value="3">
-            <Check_Internet />
+          <TabPanel value="1">
+            <Firewall_Info_Table />
           </TabPanel>
+          <TabPanel value="2">Item two</TabPanel>
+          <TabPanel value="3">Item three</TabPanel>
         </TabContext>
       </Box>
 
-      <Chip icon={<StorageIcon />} label={ram} onClick={handleOpenRam}></Chip>
-      <Modal
-        open={openRam}
-        onClose={handleCloseRam}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+      <div>
+        {connected ? (
+          <Chip
+            label="Connected"
+            className="!bg-green-500 !text-white !rounded-full !px-4 !py-1"
+          />
+        ) : (
+          <Chip
+            label="Error"
+            className="!bg-red-500 !text-white !rounded-full !px-4 !py-1"
+          />
+        )}
+
+        <Chip
+          icon={<StorageIcon />}
+          label={ram}
+          onClick={handleOpenRam}
+          className="!rounded-full !px-4 !py-1"
+        />
+
+        <Chip
+          icon={<ComputerIcon />}
+          label={cpu}
+          onClick={handleOpenCpu}
+          className="!rounded-full !px-4 !py-1"
+        />
+      </div>
+
+      <Modal open={openRam} onClose={handleCloseRam}>
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <Ram_wykres
-              prop_ram_data={ramData}
-              setRamData={setRamData}
-            ></Ram_wykres>
-          </Typography>
+          <Typography variant="h6">RAM Chart</Typography>
+          <Ram_wykres prop_ram_data={ramData} setRamData={setRamData} />
         </Box>
       </Modal>
 
-      <Chip icon={<ComputerIcon />} label={cpu} onClick={handleOpenCpu}></Chip>
-      <Modal
-        open={openCpu}
-        onClose={handleCloseCpu}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+      <Modal open={openCpu} onClose={handleCloseCpu}>
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <Procesor_wykres
-              prop_cpu_data={cpuData}
-              setCpuData={setCpuData}
-            ></Procesor_wykres>
-          </Typography>
+          <Typography variant="h6">CPU Chart</Typography>
+          <Procesor_wykres prop_cpu_data={cpuData} setCpuData={setCpuData} />
         </Box>
       </Modal>
-
-      {connected ? (
-        <Chip label="connected" color="green" />
-      ) : (
-        <Chip label="error" color="red" />
-      )}
     </div>
   );
 }

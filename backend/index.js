@@ -18,7 +18,7 @@ app.get("/status", async (req, res) => {
   });
   const json = await response.json();
   res.json(json);
-  console.log(json);
+  // console.log(json);
 });
 
 app.get("/tool/internet", async (req, res) => {
@@ -40,6 +40,47 @@ app.get("/tool/internet", async (req, res) => {
       count: packets,
     }),
   });
+
+  const json = await response.json();
+  res.json(json);
+  console.log(json);
+});
+
+app.get("/firewall/info", async (req, res) => {
+  const response = await fetch(`http://${m_host}/rest/ip/firewall/filter`, {
+    method: "GET",
+    headers: {
+      Authorization: authorization_header,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
+  const json = await response.json();
+  res.json(json);
+  console.log(json);
+});
+
+app.get("/firewall/changeDisabledStatus", async (req, res) => {
+  const disabled = req.query.disabled;
+  const id = req.query.id;
+
+  console.log("disabled", disabled);
+  console.log("id", id);
+  const response = await fetch(
+    `http://${m_host}/rest/ip/firewall/filter/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: authorization_header,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        disabled: disabled.toString() === "true",
+      }),
+    }
+  );
 
   const json = await response.json();
   res.json(json);
